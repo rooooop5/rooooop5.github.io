@@ -22,10 +22,14 @@ To show a real recording of Zimi, put the file in `public/` (for example `public
 
 Shopko has no public repository yet, so its card shows "Private repo". Add a `links` entry when it's published.
 
-## Deploy on Vercel
+## Deploy
 
-Import the repository in Vercel. It detects Vite automatically (build command `npm run build`, output directory `dist`), so no extra config is needed. Or from the terminal:
+The live site is on GitHub Pages at https://rooooop5.github.io/. To publish changes:
 
 ```bash
-npx vercel
+npm run deploy
 ```
+
+That builds the site and pushes `dist/` to the `gh-pages` branch, which Pages serves.
+
+It also works on Vercel: import the repository and Vercel detects Vite automatically.
