@@ -5,8 +5,9 @@ export type Project = {
   name: string
   kind: string
   tagline: string
-  summary: string
-  highlights: string[]
+  tags: string[]
+  about: string
+  features: string[]
   stack: string[]
   snippet: string[]
   links: Link[]
@@ -22,37 +23,40 @@ export const featured: Project[] = [
   {
     slug: "nanoshell",
     name: "Nanoshell",
-    kind: "Systems · C",
-    tagline: "A Unix shell written from scratch, with an undoable trash and a built-in LLM assistant.",
-    summary:
-      "Runs programs with fork/execvp, hands each child its own process group and the terminal so Ctrl+C reaches the child instead of the shell, and parses quoting properly, rejecting unclosed quotes.",
-    highlights: [
-      "trash: soft delete with --list, --restore and --purge, backed by an append-only log so state survives restarts",
-      "nix: an LLM assistant over libcurl with session history and --model / --format / --len flags",
-      "Builtins for cd (with cd - and ~), pwd, help and exit",
-      "Modular core/, builtins/ and utils/ with clear memory ownership and an ASan debug build",
+    kind: "Terminal",
+    tagline: "My own command line, built from scratch, with an undo button for deleted files.",
+    tags: ["C", "Systems"],
+    about:
+      "A shell is the program you type commands into. I wrote one from the ground up to learn how the terminal really works, then added two things regular shells don't have.",
+    features: [
+      "Delete a file by mistake? Put it straight back, even after a restart.",
+      "Ask a built-in AI assistant questions without leaving the terminal.",
+      "Ctrl+C stops the program you're running, not the shell itself.",
+      "Handles quotes and folders the way you'd expect.",
     ],
-    stack: ["C", "POSIX", "libcurl", "cJSON", "Make", "ASan"],
+    stack: ["C", "POSIX", "libcurl", "cJSON", "Make"],
     snippet: ["$ trash notes.txt", "$ trash --list", "$ trash --restore notes.txt"],
     links: [gh("Nanoshell")],
   },
   {
     slug: "shopko",
     name: "Shopko",
-    kind: "Backend · Python",
-    tagline: "A multi-seller marketplace API with role-based access, cart, checkout and Razorpay payments.",
-    summary:
-      "Checkout reserves stock, opens a Razorpay order and records a pending payment. The server verifies the HMAC-SHA256 signature, confirms capture with Razorpay, and expires unpaid checkouts after 10 minutes, putting the stock back.",
-    highlights: [
-      "RBAC with 4 system roles and 23 permissions, plus custom roles managed through the API",
-      "Role-aware responses: the same endpoint shows admins, sellers and customers different views",
-      "Seller order flow enforced as PENDING → CONFIRMED → SHIPPED → DELIVERED",
-      "Fully async router → service → model layers, Docker, and 45 pytest tests run in rolled-back transactions",
+    kind: "Online store",
+    tagline: "The engine behind an online marketplace where many sellers can open shop.",
+    tags: ["Python", "Payments"],
+    about:
+      "Shopko is the server side of a marketplace: accounts, products, carts, orders and real payments through Razorpay. It's the most complete backend I've built.",
+    features: [
+      "Customers browse, fill a cart and pay securely with Razorpay.",
+      "Stock is held while you pay and released if you walk away.",
+      "Admins, sellers and customers each get their own permissions and view.",
+      "Sellers move orders from confirmed to shipped to delivered.",
+      "Backed by 45 automated tests.",
     ],
-    stack: ["FastAPI", "SQLAlchemy 2 (async)", "Pydantic v2", "PyJWT", "Argon2", "Razorpay", "Docker", "pytest"],
+    stack: ["FastAPI", "SQLAlchemy", "Razorpay", "Docker", "pytest"],
     snippet: [
-      "checkout   → stock reserved, payment pending",
-      "verify     → HMAC-SHA256 ok, capture confirmed",
+      "checkout    → stock held, payment pending",
+      "pay         → verified, order confirmed",
       "10 min idle → expired, stock returned",
     ],
     links: [],
@@ -60,95 +64,100 @@ export const featured: Project[] = [
   {
     slug: "codeth",
     name: "Codeth",
-    kind: "AI tooling · Python",
-    tagline: "A terminal coding agent for any Ollama model, with path sandboxing and approval gates.",
-    summary:
-      "A tool-calling loop gives the model eight tools for reading, listing, creating and editing files and running Python. Every path goes through composable sandbox checks, and overwrites or code execution stop for a y/n approval.",
-    highlights: [
-      "Structured ToolResult errors that tell the model how to recover",
-      "Asks the model for a summary when the iteration budget runs out, instead of failing silently",
-      "Dot-commands like .model=, .tokens and .verbose",
-      "Rich terminal UI with syntax-highlighted approval panels",
+    kind: "AI assistant",
+    tagline: "An AI coding helper that lives in your terminal and asks before it changes anything.",
+    tags: ["Python", "AI"],
+    about:
+      "Codeth lets an AI model read and edit code in a project folder, in the style of tools like Claude Code. It works with any model from Ollama, including ones on your own machine.",
+    features: [
+      "Reads, creates and edits files to finish a coding task.",
+      "Stays inside the folder you give it.",
+      "Stops and asks you before overwriting a file or running code.",
+      "Sums up what it did if it runs out of steps.",
     ],
     stack: ["Python", "Ollama", "Rich"],
-    snippet: ["› overwrite_file src/app.py", "  ┌ diff preview ┐", "  approve? [y/n] y"],
+    snippet: ["› overwrite_file src/app.py", "  ┌ preview ┐", "  approve? [y/n] y"],
     links: [gh("Codeth")],
   },
   {
     slug: "ytee",
     name: "ytee",
-    kind: "CLI · Python · on PyPI",
-    tagline: "Upload a video, or a whole folder of them, to YouTube from the terminal.",
-    summary:
-      "ytee init, set-creds (browser OAuth with token refresh), then upload --path. Uploads are resumable and chunked, with a live table of progress, speed and ETA per file.",
-    highlights: [
-      "Errors sorted by cause: 403 as quota, 401 as an expired token, 5xx and network errors retried",
-      "Every upload logged locally, plus a migrate command for older credentials",
-      "Published to PyPI from GitHub Actions with trusted publishing on tags",
+    kind: "Published tool",
+    tagline: "Upload one video, or a whole folder of them, to YouTube with a single command.",
+    tags: ["Python", "On PyPI"],
+    about:
+      "I got tired of uploading videos one by one through the browser, so I built a tool for it and published it so anyone can install it.",
+    features: [
+      "Sign in with Google once and you're set.",
+      "Shows live progress, speed and time left for every video.",
+      "Big uploads go up in chunks, and dropped connections are retried.",
+      "Install it with: pip install ytee",
     ],
-    stack: ["Python", "Typer", "Rich", "YouTube Data API", "GitHub Actions"],
-    snippet: ["$ pip install ytee", "$ ytee upload --path ./vlogs", "  3 files · 41% · 6.2 MB/s · ETA 2:10"],
+    stack: ["Python", "Typer", "Rich", "YouTube API", "GitHub Actions"],
+    snippet: ["$ pip install ytee", "$ ytee upload --path ./vlogs", "  3 videos · 41% · ETA 2:10"],
     links: [gh("ytee"), { label: "PyPI", href: "https://pypi.org/project/ytee/" }],
   },
   {
     slug: "lightexpress",
     name: "LightExpress",
-    kind: "Framework · Node.js",
-    tagline: "An Express-style HTTP framework with zero dependencies and a trie router.",
-    summary:
-      "Built directly on Node's http module. The router is a trie where a static segment beats a :param at the same position, and middleware prefixes match whole segments, so /api never matches /apiFoo.",
-    highlights: [
-      "Mountable router instances",
-      "JSON body parser with a size limit and distinct 413 / 400 responses",
-      "res.status, send, json, set and redirect helpers",
-      "Separate 404 and 405 responses, and errors from sync or async handlers become a 500",
+    kind: "Web framework",
+    tagline: "My own take on Express, the popular tool for building websites with Node.js.",
+    tags: ["JavaScript", "Web"],
+    about:
+      "To understand how web frameworks work underneath, I rebuilt a small version of Express without using any outside packages.",
+    features: [
+      "Sends each web address to the right piece of code.",
+      "Supports middleware that runs before your pages.",
+      "Reads JSON sent by forms and apps, with a size limit.",
+      "Turns crashes into clean error responses.",
     ],
-    stack: ["Node.js", "ESM", "node:http"],
-    snippet: ["app.get('/users/me', …)    // static wins", "app.get('/users/:id', …)", "GET /users/me → 200"],
+    stack: ["Node.js", "JavaScript"],
+    snippet: ["app.get('/users/:id', …)", "app.use('/api', auth)", "GET /users/7 → 200"],
     links: [gh("light-express")],
   },
   {
     slug: "attendance",
     name: "Attendance Tracker",
-    kind: "Backend · Python",
-    tagline: "A personal college attendance API I use every day: timetable, substitutions and stats.",
-    summary:
-      "Define papers and a weekly timetable, and a scheduler creates each day's attendance rows and backfills missed days. Mark a whole day or a single period, cancel a class, add extras, and record substitutions that keep the scheduled class as history.",
-    highlights: [
-      "Invariant that only one class is active per period",
-      "Clean router, service and model layers with domain exceptions mapped to HTTP codes",
-      "Overall and per-paper percentages",
-      "Typed SQLAlchemy 2.0 models and a scripted SQLite backup",
+    kind: "Everyday tool",
+    tagline: "Keeps track of my college attendance so I always know where I stand.",
+    tags: ["Python", "Daily use"],
+    about:
+      "I built this for myself and use it every day. It knows my weekly timetable and fills in each day's classes automatically.",
+    features: [
+      "Mark a whole day, or just one class.",
+      "Handles cancelled classes, extra classes and substitutions.",
+      "Shows attendance percentage overall and for each subject.",
+      "Catches up on days I forgot to open it.",
     ],
-    stack: ["FastAPI", "SQLAlchemy 2.0", "SQLite", "APScheduler", "Pydantic"],
-    snippet: ["period 3   scheduled   kept as history", "period 3   substitute  active", "overall    per-paper   percentages"],
+    stack: ["FastAPI", "SQLAlchemy", "SQLite", "APScheduler"],
+    snippet: ["mark day  → every class present", "cancel    → class not counted", "stats     → overall and per subject"],
     links: [gh("attendance-tracker")],
-    note: "Backend by me. The browser frontend was written by Codex.",
+    note: "I built the backend. The web page on top of it was written by Codex.",
   },
 ]
 
 export const zimi = {
   name: "Zimi",
-  kind: "Hardware · C++",
-  tagline: "Animated robot eyes on a 128×64 OLED, running on an ESP32.",
+  kind: "Hardware",
+  tagline: "A tiny robot face that blinks, glances around and shows moods.",
   summary:
-    "Eased transitions for wake-up, blink, wink, confused, happy, sad and angry moods, drawn by masking the eye shapes, plus random glances and a wiggle. A push-button turns the robot on and off.",
-  stack: ["C++", "Arduino", "ESP32", "PlatformIO", "U8g2", "Wokwi"],
+    "Zimi's eyes run on a small ESP32 board with an OLED screen. It wakes up, blinks, winks, and looks happy, sad or angry. A button turns it on and off.",
+  stack: ["C++", "Arduino", "ESP32"],
   // Put a recording in public/ (e.g. "/zimi.gif") to show it instead of the drawn eyes.
   gif: undefined as string | undefined,
 }
 
 export const experiments = {
-  title: "C experiments",
+  title: "Smaller experiments",
   items: [
     {
       name: "cstring",
-      text: "An opaque, single-allocation String type for C with find, split, join, slice and case helpers, benchmarked against Python.",
+      text: "A friendlier, safer way to work with text in C, timed against Python.",
       href: "https://github.com/rooooop5/cstring",
     },
     {
       name: "Clib",
-      text: "Macro-generated, type-generic vector and stack, plus bracket-balancing and postfix exercises built on them.",
+      text: "Reusable lists and stacks for C that work with any type of data.",
       href: "https://github.com/rooooop5/CLib",
     },
   ],

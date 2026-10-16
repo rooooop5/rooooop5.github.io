@@ -1,15 +1,19 @@
 import { ArrowDown, ArrowUpRight } from "lucide-react"
+import { useState } from "react"
 
 import { GitHubIcon } from "@/components/icons"
 import { ProjectCard } from "@/components/project-card"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ProjectDetails } from "@/components/project-details"
 import { ZimiEyes } from "@/components/zimi-eyes"
 import { Badge } from "@/components/ui/badge"
+import { BlurFade } from "@/components/ui/blur-fade"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { experiments, featured, zimi } from "@/data/projects"
+import { DotPattern } from "@/components/ui/dot-pattern"
+import { MagicCard } from "@/components/ui/magic-card"
+import { WordRotate } from "@/components/ui/word-rotate"
+import { experiments, featured, zimi, type Project } from "@/data/projects"
 import { profile } from "@/data/profile"
+import { cn } from "@/lib/utils"
 
 const nav = [
   { href: "#work", label: "Work" },
@@ -19,17 +23,21 @@ const nav = [
 
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
-    <div className="mb-8 flex flex-col gap-2">
+    <BlurFade inView className="mb-8 flex flex-col gap-2">
       <span className="font-mono text-xs tracking-wider text-brand uppercase">{eyebrow}</span>
       <h2 className="text-3xl font-semibold tracking-tight text-balance">{title}</h2>
-    </div>
+    </BlurFade>
   )
 }
 
 export default function App() {
+  // Keep the last project after closing so its content stays put while the dialog animates out.
+  const [selected, setSelected] = useState<Project | null>(null)
+  const [open, setOpen] = useState(false)
+
   return (
     <div className="min-h-svh">
-      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b bg-background/70 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
           <a href="#top" className="font-mono text-sm">
             <span className="text-brand">~/</span>
@@ -46,29 +54,44 @@ export default function App() {
                 <GitHubIcon />
               </a>
             </Button>
-            <ThemeToggle />
           </nav>
         </div>
       </header>
 
-      <main id="top" className="mx-auto max-w-5xl px-4 sm:px-6">
-        <section className="flex flex-col gap-6 py-20 sm:py-28">
-          <span className="font-mono text-sm text-muted-foreground">{profile.role}</span>
-          <h1 className="text-5xl font-semibold tracking-tight sm:text-7xl">{profile.name}</h1>
-          <p className="max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground">
-            {profile.intro}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {["C", "Python", "FastAPI", "Node.js", "C++ / ESP32", "LLM tooling"].map((t) => (
-              <Badge key={t} variant="outline" className="font-mono font-normal">
-                {t}
-              </Badge>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-3 pt-2">
+      <div id="top" className="relative overflow-hidden">
+        <DotPattern
+          className={cn(
+            "text-white/15",
+            "[mask-image:radial-gradient(ellipse_at_top,white_20%,transparent_70%)]",
+          )}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[40rem] -translate-x-1/2 rounded-full bg-brand/15 blur-3xl"
+        />
+        <section className="relative mx-auto flex max-w-5xl flex-col gap-6 px-4 py-24 sm:px-6 sm:py-32">
+          <BlurFade delay={0.05}>
+            <span className="font-mono text-sm text-muted-foreground">Hi, I'm</span>
+          </BlurFade>
+          <BlurFade delay={0.1}>
+            <h1 className="text-5xl font-semibold tracking-tight sm:text-7xl">{profile.name}</h1>
+          </BlurFade>
+          <BlurFade delay={0.15} className="flex flex-wrap items-baseline gap-x-3 text-2xl sm:text-3xl">
+            <span className="text-muted-foreground">I build</span>
+            <WordRotate
+              words={[...profile.building]}
+              className="font-semibold text-brand"
+            />
+          </BlurFade>
+          <BlurFade delay={0.2}>
+            <p className="max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground">
+              {profile.intro}
+            </p>
+          </BlurFade>
+          <BlurFade delay={0.25} className="flex flex-wrap gap-3 pt-2">
             <Button size="lg" asChild>
               <a href="#work">
-                See the work <ArrowDown />
+                See my projects <ArrowDown />
               </a>
             </Button>
             <Button size="lg" variant="outline" asChild>
@@ -76,64 +99,72 @@ export default function App() {
                 <GitHubIcon /> GitHub
               </a>
             </Button>
-          </div>
+          </BlurFade>
         </section>
+      </div>
 
-        <section id="work" className="scroll-mt-20 pb-20">
-          <SectionHeading eyebrow="Selected work" title="Six projects I'd show first" />
-          <div className="grid gap-6 lg:grid-cols-2">
+      <main className="mx-auto max-w-5xl px-4 sm:px-6">
+        <section id="work" className="scroll-mt-20 pt-8 pb-20">
+          <SectionHeading eyebrow="Projects" title="Things I've built" />
+          <div className="grid gap-4 sm:grid-cols-2">
             {featured.map((project, i) => (
-              <ProjectCard key={project.slug} project={project} index={i} />
+              <BlurFade key={project.slug} inView delay={0.05 * (i % 2)} className="h-full">
+                <ProjectCard project={project} index={i} onOpen={() => {
+                    setSelected(project)
+                    setOpen(true)
+                  }} />
+              </BlurFade>
             ))}
           </div>
         </section>
 
         <section id="zimi" className="scroll-mt-20 pb-20">
-          <SectionHeading eyebrow="Off the screen" title="Zimi, a robot with moods" />
-          <Card className="overflow-hidden py-0">
-            <div className="grid md:grid-cols-[1.1fr_1fr]">
-              <div className="flex items-center justify-center bg-oled p-6 sm:p-10">
-                <div className="aspect-[2/1] w-full max-w-md rounded-md ring-1 ring-white/10">
-                  {zimi.gif ? (
-                    <img
-                      src={zimi.gif}
-                      alt="Zimi's eyes animating on the OLED"
-                      className="h-full w-full rounded-md object-cover"
-                    />
-                  ) : (
-                    <ZimiEyes />
-                  )}
+          <SectionHeading eyebrow="Off the screen" title="Meet Zimi" />
+          <BlurFade inView>
+            <MagicCard className="overflow-hidden rounded-xl" gradientColor="#1c2330">
+              <div className="grid md:grid-cols-[1.1fr_1fr]">
+                <div className="flex items-center justify-center bg-oled p-6 sm:p-10">
+                  <div className="aspect-[2/1] w-full max-w-md rounded-md ring-1 ring-white/10">
+                    {zimi.gif ? (
+                      <img
+                        src={zimi.gif}
+                        alt="Zimi's eyes animating on its screen"
+                        className="h-full w-full rounded-md object-cover"
+                      />
+                    ) : (
+                      <ZimiEyes />
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center gap-4 p-6 sm:p-8">
+                  <span className="font-mono text-xs text-muted-foreground">{zimi.kind}</span>
+                  <h3 className="text-2xl font-semibold tracking-tight">{zimi.name}</h3>
+                  <p className="text-pretty text-muted-foreground">{zimi.tagline}</p>
+                  <p className="text-sm leading-relaxed text-pretty">{zimi.summary}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {zimi.stack.map((s) => (
+                      <Badge key={s} variant="secondary" className="font-normal">
+                        {s}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <CardContent className="flex flex-col justify-center gap-4 p-6 sm:p-8">
-                <span className="font-mono text-xs text-muted-foreground">{zimi.kind}</span>
-                <h3 className="text-2xl font-semibold tracking-tight">{zimi.name}</h3>
-                <p className="text-pretty text-muted-foreground">{zimi.tagline}</p>
-                <p className="text-sm leading-relaxed text-pretty">{zimi.summary}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {zimi.stack.map((s) => (
-                    <Badge key={s} variant="secondary" className="font-mono font-normal">
-                      {s}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </div>
-          </Card>
+            </MagicCard>
+          </BlurFade>
         </section>
 
         <section id="experiments" className="scroll-mt-20 pb-24">
-          <SectionHeading eyebrow="Smaller things" title={experiments.title} />
-          <Card className="py-2">
-            <CardContent className="flex flex-col px-2">
-              {experiments.items.map((item, i) => (
-                <div key={item.name}>
-                  {i > 0 && <Separator />}
+          <SectionHeading eyebrow="On the side" title={experiments.title} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {experiments.items.map((item, i) => (
+              <BlurFade key={item.name} inView delay={0.05 * i} className="h-full">
+                <MagicCard className="h-full rounded-xl" gradientColor="#1c2330">
                   <a
                     href={item.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="group flex items-start justify-between gap-4 rounded-md px-4 py-4 transition-colors hover:bg-muted/50"
+                    className="group flex h-full items-start justify-between gap-4 rounded-xl p-5 outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <div className="flex flex-col gap-1">
                       <span className="font-mono text-sm font-medium">{item.name}</span>
@@ -141,10 +172,10 @@ export default function App() {
                     </div>
                     <ArrowUpRight className="mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </a>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                </MagicCard>
+              </BlurFade>
+            ))}
+          </div>
         </section>
       </main>
 
@@ -161,6 +192,8 @@ export default function App() {
           </Button>
         </div>
       </footer>
+
+      <ProjectDetails project={selected} open={open} onOpenChange={setOpen} />
     </div>
   )
 }

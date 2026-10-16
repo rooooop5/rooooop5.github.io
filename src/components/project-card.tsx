@@ -1,79 +1,47 @@
-import { ArrowUpRight, Lock } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 
-import { GitHubIcon } from "@/components/icons"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { MagicCard } from "@/components/ui/magic-card"
 import type { Project } from "@/data/projects"
 
-export function ProjectCard({ project, index }: { project: Project; index: number }) {
+type Props = { project: Project; index: number; onOpen: () => void }
+
+export function ProjectCard({ project, index, onOpen }: Props) {
   return (
-    <Card id={project.slug} className="scroll-mt-24 gap-5">
-      <CardHeader>
-        <div className="flex items-center gap-3 font-mono text-xs text-muted-foreground">
-          <span className="text-brand">{String(index + 1).padStart(2, "0")}</span>
-          <span>{project.kind}</span>
+    <MagicCard
+      className="h-full rounded-xl"
+      gradientFrom="var(--brand)"
+      gradientTo="var(--oled-fg)"
+      gradientColor="#1c2330"
+    >
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-haspopup="dialog"
+        className="group flex h-full w-full flex-col gap-4 rounded-xl p-6 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <div className="flex items-center justify-between font-mono text-xs text-muted-foreground">
+          <span>
+            <span className="text-brand">{String(index + 1).padStart(2, "0")}</span>
+            <span className="ml-3">{project.kind}</span>
+          </span>
+          <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground" />
         </div>
-        <CardTitle className="text-2xl tracking-tight">{project.name}</CardTitle>
-        <CardDescription className="text-base text-pretty">{project.tagline}</CardDescription>
-      </CardHeader>
-
-      <CardContent className="flex flex-col gap-5">
-        <pre className="overflow-x-auto rounded-lg border bg-muted/50 px-4 py-3 font-mono text-[0.8rem] leading-relaxed text-muted-foreground">
-          {project.snippet.join("\n")}
-        </pre>
-
-        <p className="text-sm leading-relaxed text-pretty">{project.summary}</p>
-
-        <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
-          {project.highlights.map((h) => (
-            <li key={h} className="flex gap-2.5">
-              <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
-              <span className="text-pretty">{h}</span>
-            </li>
-          ))}
-        </ul>
-
-        {project.note && (
-          <p className="rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground">
-            {project.note}
-          </p>
-        )}
-      </CardContent>
-
-      <CardFooter className="mt-auto flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1.5">
-          {project.stack.map((s) => (
-            <Badge key={s} variant="secondary" className="font-mono font-normal">
-              {s}
-            </Badge>
-          ))}
+        <h3 className="text-2xl font-semibold tracking-tight">{project.name}</h3>
+        <p className="text-pretty text-muted-foreground">{project.tagline}</p>
+        <div className="mt-auto flex items-center justify-between gap-3 pt-2">
+          <div className="flex flex-wrap gap-1.5">
+            {project.tags.map((t) => (
+              <Badge key={t} variant="secondary" className="font-normal">
+                {t}
+              </Badge>
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+            View details
+          </span>
         </div>
-        <div className="flex gap-2">
-          {project.links.length === 0 ? (
-            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Lock className="size-3.5" /> Private repo
-            </span>
-          ) : (
-            project.links.map((link) => (
-              <Button key={link.href} variant="outline" size="sm" asChild>
-                <a href={link.href} target="_blank" rel="noreferrer">
-                  {link.label === "Source" ? <GitHubIcon /> : null}
-                  {link.label}
-                  {link.label !== "Source" ? <ArrowUpRight /> : null}
-                </a>
-              </Button>
-            ))
-          )}
-        </div>
-      </CardFooter>
-    </Card>
+      </button>
+    </MagicCard>
   )
 }
